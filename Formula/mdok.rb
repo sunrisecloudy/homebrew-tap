@@ -1,22 +1,35 @@
 class Mdok < Formula
-  desc "Turn Markdown API examples into executable workflows"
+  desc "Markdown-native API testing: executable .md API workflows"
   homepage "https://github.com/sunrisecloudy/mdok"
-  url "https://github.com/sunrisecloudy/mdok/releases/download/v0.1.0/mdok-0.1.0-source.tar.gz"
-  sha256 "c9df3ab5c1eba4b9b75c6493175cf8d5c0b4cf2fb2e541824e092dc9f6d4d320"
   license "MIT"
+  version "0.2.0"
 
-  depends_on "cmake" => :build
-  depends_on "rust" => :build
-  depends_on "openssl@3"
-  depends_on "zlib"
+  on_macos do
+    if Hardware::CPU.arm?
+      url "https://github.com/sunrisecloudy/mdok/releases/download/v0.2.0/mdok-0.2.0-aarch64-apple-darwin.tar.gz"
+      sha256 "#{AARM}"
+    end
+    if Hardware::CPU.intel?
+      url "https://github.com/sunrisecloudy/mdok/releases/download/v0.2.0/mdok-0.2.0-x86_64-apple-darwin.tar.gz"
+      sha256 "#{AINT}"
+    end
+  end
+  on_linux do
+    if Hardware::CPU.arm?
+      url "https://github.com/sunrisecloudy/mdok/releases/download/v0.2.0/mdok-0.2.0-aarch64-unknown-linux-gnu.tar.gz"
+      sha256 "#{LARM}"
+    end
+    if Hardware::CPU.intel?
+      url "https://github.com/sunrisecloudy/mdok/releases/download/v0.2.0/mdok-0.2.0-x86_64-unknown-linux-gnu.tar.gz"
+      sha256 "#{LINT}"
+    end
+  end
 
   def install
-    ENV["OPENSSL_ROOT_DIR"] = formula_opt_prefix("openssl@3")
-    ENV["ZLIB_ROOT"] = formula_opt_prefix("zlib")
-    system "cargo", "install", *std_cargo_args(path: "crates/mdok-cli")
+    bin.install "mdok"
   end
 
   test do
-    assert_match "mdok 0.1.0", shell_output("#{bin}/mdok --version")
+    assert_match version.to_s, shell_output("\#{bin}/mdok version")
   end
 end
